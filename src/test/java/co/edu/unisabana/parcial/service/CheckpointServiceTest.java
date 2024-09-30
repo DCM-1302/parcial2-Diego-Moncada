@@ -27,7 +27,7 @@ class CheckpointServiceTest {
     void testCheckout_ValidData() {
         // Given
         CheckpointDTO checkpointDTO = new CheckpointDTO("facility1", "driver1", 15);
-        Checkin lastCheckin = new Checkin("facility1", "driver1", 10);  // Último check-in encontrado
+        Checkin lastCheckin = new Checkin("facility1", "driver1", 10);
 
         Mockito.when(checkpointPort.findLastCheckin(checkpointDTO.driver, checkpointDTO.facility))
                 .thenReturn(lastCheckin);
@@ -36,7 +36,7 @@ class CheckpointServiceTest {
         checkpointService.checkout(checkpointDTO);
 
         // Then
-        Mockito.verify(checkpointPort, times(1)).saveCheckout(any(Checkout.class));
+        Mockito.verify(checkpointPort, Mockito.times(1)).saveCheckout(Mockito.any(Checkout.class));
     }
 
     @Test
@@ -52,15 +52,14 @@ class CheckpointServiceTest {
                 () -> checkpointService.checkout(checkpointDTO));
         assertEquals("don't exist previously check in", exception.getMessage());
 
-        Mockito.verify(checkpointPort, never()).saveCheckout(any(Checkout.class));  // No debería llamar a saveCheckout
+        Mockito.verify(checkpointPort, Mockito.never()).saveCheckout(Mockito.any(Checkout.class));
     }
 
     @Test
     void testCheckout_InvalidDayOfMonth_ThrowsException() {
         // Given
         CheckpointDTO checkpointDTO = new CheckpointDTO("facility1", "driver1", 32);
-        Checkin lastCheckin = new Checkin("facility1", "driver1", 10);  // Último check-in encontrado
-
+        Checkin lastCheckin = new Checkin("facility1", "driver1", 10);
         Mockito.when(checkpointPort.findLastCheckin(checkpointDTO.driver, checkpointDTO.facility))
                 .thenReturn(lastCheckin);
 
@@ -69,7 +68,7 @@ class CheckpointServiceTest {
                 () -> checkpointService.checkout(checkpointDTO));
         assertEquals("Invalid date", exception.getMessage());
 
-        Mockito.verify(checkpointPort, never()).saveCheckout(any(Checkout.class));  // No debería llamar a saveCheckout
+        Mockito.verify(checkpointPort, Mockito.never()).saveCheckout(Mockito.any(Checkout.class));
     }
 
 }
