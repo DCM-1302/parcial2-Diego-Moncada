@@ -5,6 +5,7 @@ import co.edu.unisabana.parcial.repository.sql.entity.Checkpoint;
 import co.edu.unisabana.parcial.repository.sql.jpa.CheckpointRepository;
 import co.edu.unisabana.parcial.service.model.Checkin;
 import co.edu.unisabana.parcial.service.model.Checkout;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -60,7 +61,7 @@ class CheckpointDAOTest {
 
         Checkin result = checkpointDAO.findLastCheckin(driver, facility);
 
-        assertNotNull(result);
+        Assertions.assertNotNull(result);
         Mockito.verify(checkpointRepository, Mockito.times(1))
                 .findFirstByDriverAndFacilityAndFinalizedIsFalse(driver, facility);
     }
@@ -73,13 +74,38 @@ class CheckpointDAOTest {
         Mockito.when(checkpointRepository.findFirstByDriverAndFacilityAndFinalizedIsFalse(driver, facility))
                 .thenReturn(Optional.empty());
 
-        // When
         Checkin result = checkpointDAO.findLastCheckin(driver, facility);
 
-        // Then
-        assertNull(result);
+        Assertions.assertNull(result);
         Mockito.verify(checkpointRepository, Mockito.times(1))
                 .findFirstByDriverAndFacilityAndFinalizedIsFalse(driver, facility);
+    }
+
+    @Test
+    void testFinishCheckin() {
+
+        Checkin checkin = new Checkin("facility","driver",25);
+        checkin.setId(1);
+        Checkpoint checkpoint = new Checkpoint();
+        Mockito.when(checkpointRepository.findById(1)).thenReturn(Optional.of(checkpoint));
+
+        checkpointDAO.finishCheckin(checkin);
+
+        Assertions.assertTrue(checkpoint.isFinalized());
+        Mockito.verify(checkpointRepository, Mockito.times(1)).findById(1);
+        Mockito.verify(checkpointRepository, Mockito.times(1)).save(checkpoint);
+    }
+
+    @Test
+    void testFinishCheckin_NotFound() {
+
+        Checkin checkin = new Checkin("facility","driver",25);
+        checkin.setId(1);
+        Mockito.when(checkpointRepository.findById(1)).thenReturn(Optional.empty());
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> checkpointDAO.finishCheckin(checkin));
+        Mockito.verify(checkpointRepository, Mockito.times(1)).findById(1);
+        Mockito.verify(checkpointRepository, Mockito.never()).save(Mockito.any(Checkpoint.class));  // No se debería llamar a save
     }
 
 
