@@ -11,4 +11,5 @@ public class Checkin {
 
   private final int dayOfMonth;
   private int id;
+
 }

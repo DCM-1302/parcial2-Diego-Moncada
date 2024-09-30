@@ -10,8 +10,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import javax.persistence.Id;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -21,7 +19,7 @@ class CheckpointServiceTest {
     CheckpointDAO checkpointPort;
 
     @InjectMocks
-    CheckpointService checkpointService;
+    CheckpointService service;
 
     @Test
     void testCheckout_ValidData() {
@@ -33,7 +31,7 @@ class CheckpointServiceTest {
                 .thenReturn(lastCheckin);
 
         // When
-        checkpointService.checkout(checkpointDTO);
+        service.checkout(checkpointDTO);
 
         // Then
         Mockito.verify(checkpointPort, Mockito.times(1)).saveCheckout(Mockito.any(Checkout.class));
@@ -49,7 +47,7 @@ class CheckpointServiceTest {
 
         // When / Then
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> checkpointService.checkout(checkpointDTO));
+                () -> service.checkout(checkpointDTO));
         assertEquals("don't exist previously check in", exception.getMessage());
 
         Mockito.verify(checkpointPort, Mockito.never()).saveCheckout(Mockito.any(Checkout.class));
@@ -65,7 +63,7 @@ class CheckpointServiceTest {
 
         // When / Then
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> checkpointService.checkout(checkpointDTO));
+                () -> service.checkout(checkpointDTO));
         assertEquals("Invalid date", exception.getMessage());
 
         Mockito.verify(checkpointPort, Mockito.never()).saveCheckout(Mockito.any(Checkout.class));
