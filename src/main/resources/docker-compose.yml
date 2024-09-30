@@ -1,0 +1,20 @@
+version: '3'
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: springboot-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: yms_user
+      MYSQL_PASSWORD: yms_clave
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./data:/var/lib/mysql
+    networks:
+      - springboot-network
+
+networks:
+  springboot-network:
+    driver: bridge
